@@ -21,10 +21,12 @@ export class TasksService {
     return taskFound;
   }
 
-  async getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+  async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
     const { status, search } = filterDto;
 
-    let tasks = await this.tasksRepository.find();
+    let tasks = await this.tasksRepository.find({
+      where: { user },
+    });
 
     // do something with status
     if (status) {
