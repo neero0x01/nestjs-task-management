@@ -3,7 +3,7 @@ import { TasksStatus } from './task-status.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-task-filter.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from '../entities/task.entity';
+import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
