@@ -9,11 +9,14 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
@@ -39,7 +42,9 @@ export class AuthService {
     }
   }
 
-  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+  async signIn(
+    authCredentialsDto: AuthCredentialsDto,
+  ): Promise<{ token: string }> {
     const { username, password } = authCredentialsDto;
 
     const userExists = await this.usersRepository.findOne({
@@ -47,7 +52,9 @@ export class AuthService {
     });
 
     if (userExists && (await bcrypt.compare(password, userExists.password))) {
-      return 'token';
+      const payload: JwtPayload = { username };
+      const accessToken = await this.jwtService.sign(payload);
+      return { token: accessToken };
     } else {
       throw new UnauthorizedException('Invalid credentials');
     }
